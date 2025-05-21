@@ -52,20 +52,21 @@ class Node(object):
         return "<Node: ({})>".format(self.name)
 
     def details(self):
-        fmt = "-" * 32 + "\n"
-        fmt += "<Node: ({})>\n".format(self.name)
-        fmt += " " * 4 + "IN:\n"
-        for in_node in self.inputs:
-            fmt += " " * 8 + "{}\n".format(in_node)
-        fmt += " " * 4 + "OUT:\n"
-        for out_node in self.outputs:
-            fmt += " " * 8 + "{}\n".format(out_node)
-        fmt += " " * 4 + "DEP:\n"
-        for dep in self.dependencies:
-            fmt += " " * 8 + "{}\n".format(dep)
-        fmt += "\tenable_index_mapping={}, pruning_dim={}\n".format(
-            self.enable_index_mapping, self.pruning_dim)
-        fmt = "-" * 32 + "\n"
+        fmt = ""
+        fmt += "\n" + "-" * 32 + "\n"
+        fmt += " " * 10 + "Pruning Group"
+        fmt += "\n" + "-" * 32 + "\n"
+        for i, (dep, idxs) in enumerate(self._group):
+            # Check if the dependency is intra or inter
+            dep_type = "Intra" if dep.source.module == dep.target.module else "Inter"
+
+            if i==0:
+                fmt += "[{}] {}, idxs ({}) ={}  (Pruning Root) | {}\n".format(
+                    i, dep, len(idxs), idxs, dep_type)
+            else:
+                fmt += "[{}] {}, idxs ({}) ={} | {}\n".format(
+                    i, dep, len(idxs), idxs, dep_type)
+        fmt += "-" * 32 + "\n"
         return fmt
 
 
